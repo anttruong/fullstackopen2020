@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
-
+import "./App.css"
 
 const Persons = ({ phonebook, search, Delete }) => {
   return phonebook
@@ -12,7 +12,7 @@ const Persons = ({ phonebook, search, Delete }) => {
     </div>))
 }
 
-const PersonForm = ({ persons, setPersons }) => {
+const PersonForm = ({ persons, setPersons, setBannerMessage }) => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
 
@@ -26,6 +26,10 @@ const PersonForm = ({ persons, setPersons }) => {
         setPersons(persons.concat(response.data))
         setNewName('')
         setNewNumber('')
+        setBannerMessage(`Added ${newName}`)
+        setTimeout(() => {
+          setBannerMessage(null)
+        }, 5000)
       })
     }
   }
@@ -43,9 +47,6 @@ const PersonForm = ({ persons, setPersons }) => {
       <div>name: <input value={newName} onChange={handleNameChange} /></div>
       <div>number: <input value={newNumber} onChange={handleNumberChange} /></div>
       <div><button type="submit">add</button></div>
-      <div>
-        debug: {newName}
-      </div>
     </form>)
 }
 
@@ -58,9 +59,22 @@ const Filter = ({ newSearch, setNewSearch }) => {
     onChange={handleSearchChange} /></div>)
 }
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="banner">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newSearch, setNewSearch] = useState('')
+  const [bannerMessage, setBannerMessage] = useState(null)
 
   const Delete = (person) => {
     if (window.confirm(`Delete ${person.name}?`)) {
@@ -82,9 +96,11 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={bannerMessage} />
       <Filter newSearch={newSearch} setNewSearch={setNewSearch} />
       <h3>add a new</h3>
-      <PersonForm persons={persons} setPersons={setPersons} />
+      <PersonForm persons={persons} setPersons={setPersons}
+        setBannerMessage={setBannerMessage} />
       <h3>Numbers</h3>
       <Persons phonebook={persons} search={newSearch} Delete={Delete} />
     </div>
