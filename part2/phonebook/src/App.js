@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const url = 'http://localhost:3001/persons'
+
 const Persons = ({ phonebook, search }) => (
   phonebook
     .filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
@@ -16,9 +18,11 @@ const PersonForm = ({ persons, setPersons }) => {
     if (persons.map(person => person.name).includes(newPerson.name)) {
       alert(`${newName} is already added to phonebook`)
     } else {
-      setPersons(persons.concat(newPerson))
-      setNewName('')
-      setNewNumber('')
+      axios.post(url, newPerson).then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('')
+        setNewNumber('')
+      })
     }
   }
 
@@ -54,7 +58,6 @@ const App = () => {
   const [persons, setPersons] = useState([])
   const [newSearch, setNewSearch] = useState('')
 
-  const url = 'http://localhost:3001/persons'
   useEffect(() => {
     axios.get(url).then(response => {
       setPersons(response.data)
