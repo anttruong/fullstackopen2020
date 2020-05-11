@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
-const url = 'http://localhost:3001/persons'
+import personService from './services/persons'
 
 const Persons = ({ phonebook, search }) => (
   phonebook
@@ -18,7 +16,7 @@ const PersonForm = ({ persons, setPersons }) => {
     if (persons.map(person => person.name).includes(newPerson.name)) {
       alert(`${newName} is already added to phonebook`)
     } else {
-      axios.post(url, newPerson).then(response => {
+      personService.create(newPerson).then(response => {
         setPersons(persons.concat(response.data))
         setNewName('')
         setNewNumber('')
@@ -59,7 +57,7 @@ const App = () => {
   const [newSearch, setNewSearch] = useState('')
 
   useEffect(() => {
-    axios.get(url).then(response => {
+    personService.getAll().then(response => {
       setPersons(response.data)
     })
   }, [])
