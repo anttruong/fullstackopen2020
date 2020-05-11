@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
 
-const Persons = ({ phonebook, search }) => (
-  phonebook
+
+const Persons = ({ phonebook, search, Delete }) => {
+  return phonebook
     .filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
-    .map(person => (<div key={person.name}>{person.name} {person.number}</div>)))
+    .map(person => (<div key={person.name}>
+      {person.name} {person.number}
+      <button type="button" value={person}
+        onClick={() => Delete(person)}>delete</button>
+    </div>))
+}
 
 const PersonForm = ({ persons, setPersons }) => {
   const [newName, setNewName] = useState('')
@@ -56,6 +62,17 @@ const App = () => {
   const [persons, setPersons] = useState([])
   const [newSearch, setNewSearch] = useState('')
 
+  const Delete = (person) => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService.deleteId(person.id).then(response => {
+        setPersons(persons.filter(x => x.id !== person.id))
+      }).catch(error => {
+        alert(`the name ${person.name} was already deleted from the server`)
+        setPersons(persons.filter(x => x.id !== person.id))
+      })
+    }
+  }
+
   useEffect(() => {
     personService.getAll().then(response => {
       setPersons(response.data)
@@ -69,7 +86,7 @@ const App = () => {
       <h3>add a new</h3>
       <PersonForm persons={persons} setPersons={setPersons} />
       <h3>Numbers</h3>
-      <Persons phonebook={persons} search={newSearch} />
+      <Persons phonebook={persons} search={newSearch} Delete={Delete} />
     </div>
   )
 }
